@@ -22,37 +22,36 @@ class TemplatesController extends Controller
     {
         $this->createTabs()->activate('templates');
 
-        $newReport = new ButtonLink(
+        $newTemplate = new ButtonLink(
             $this->translate('New Template'),
             Url::fromPath('reporting/templates/new')->getAbsoluteUrl('&'),
             'plus'
         );
 
-        $this->addControl($newReport);
+        $this->addControl($newTemplate);
 
         $tableRows = [];
 
         $select = (new Select())
-            ->from('report r')
-            ->columns(['r.*', 'timeframe' => 't.name'])
-            ->join('timeframe t', 'r.timeframe_id = t.id')
-            ->orderBy('r.mtime', SORT_DESC);
+            ->from('template t')
+            ->columns(['t.*', 'timeframe' => 't.name'])
+            ->orderBy('t.mtime', SORT_DESC);
 
-        foreach ($this->getDb()->select($select) as $report) {
-            $url = Url::fromPath('reporting/report', ['id' => $report->id])->getAbsoluteUrl('&');
+        foreach ($this->getDb()->select($select) as $template) {
+            $url = Url::fromPath('reporting/template/edit', ['id' => $template->id])->getAbsoluteUrl('&');
 
             $tableRows[] = Html::tag('tr', ['href' => $url], [
-                Html::tag('td', null, $report->name),
-                Html::tag('td', null, $report->author),
-                Html::tag('td', null, date('Y-m-d H:i', $report->ctime / 1000)),
-                Html::tag('td', null, date('Y-m-d H:i', $report->mtime / 1000))
+                Html::tag('td', null, $template->name),
+                Html::tag('td', null, $template->author),
+                Html::tag('td', null, date('Y-m-d H:i', $template->ctime / 1000)),
+                Html::tag('td', null, date('Y-m-d H:i', $template->mtime / 1000))
             ]);
         }
 
         if (! empty($tableRows)) {
             $table = Html::tag(
                 'table',
-                ['class' => 'common-table table-row-selectable', 'data-base-target' => '_next'],
+                ['class' => 'common-table table-row-selectable'],
                 [
                     Html::tag(
                         'thead',
