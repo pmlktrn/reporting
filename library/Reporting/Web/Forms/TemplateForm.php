@@ -89,7 +89,7 @@ class TemplateForm extends Form
             'placeholder'      => 'Enter a Report Title'
         ]);
 
-        //HEADER
+       /* //HEADER
         //select1
         $this->addElement('select', 'hcolumnone', [
             'required'  => true,
@@ -162,6 +162,7 @@ class TemplateForm extends Form
             'required'  => true,
             'options'   => [null => 'Please choose'] + $this->listActions()
         ]);
+       */
 
         /*$this->addElement('checkbox', self::COVER_FIELDS_TOGGLE, [
             'autosubmit' => true,
