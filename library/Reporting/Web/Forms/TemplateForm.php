@@ -6,12 +6,16 @@ namespace Icinga\Module\Reporting\Web\Forms;
 use Icinga\Authentication\Auth;
 use Icinga\Module\Reporting\Database;
 use Icinga\Module\Reporting\ProvidedActions;
-use Icinga\Module\Reporting\Report;
+use Icinga\Module\Reporting\Template;
 use Icinga\Module\Reporting\Web\DivDecorator;
 use Icinga\Module\Reporting\Web\Flatpickr;
+use Icinga\Module\Reporting\Web\Controller;
 use ipl\Html\Form;
 use ipl\Html\FormElement\SubmitElementInterface;
 use ipl\Html\FormElement\TextareaElement;
+use ipl\Html\Html;
+use reportingipl\Web\Url;
+use Icinga\Web;
 
 class TemplateForm extends Form
 {
@@ -19,24 +23,29 @@ class TemplateForm extends Form
     use DecoratedElement;
     use ProvidedActions;
 
-    /** @var Report */
-    protected $report;
+    //const COVER_FIELDS_TOGGLE = 'coveron';
+
+    /** @var Template */
+    protected $template;
 
     protected $id;
 
-    public function setReport(Report $report)
-    {
-        $this->report = $report;
+    const WILDCARD_NAME = 'allAndEverything';
 
-        $schedule = $report->getSchedule();
+
+    /*public function setTemplate(Template $template)
+    {
+        $this->template = $template;
+
+        $schedule = $template->getSchedule();
 
         if ($schedule !== null) {
             $this->setId($schedule->getId());
 
             $values = [
-                    'Name'     => $schedule->getStart()->format('Y-m-d H:i'),
-                    'lol' => $schedule->getFrequency(),
-                    'hehe'    => $schedule->getAction()
+                    'start'     => $schedule->getStart(),
+                   // 'action'    => $schedule->getAction(),
+                    'coveron'   => $schedule->getAction()
                 ] + $schedule->getConfig();
 
             $this->populate($values);
@@ -44,7 +53,7 @@ class TemplateForm extends Form
 
         return $this;
     }
-
+*/
     public function setId($id)
     {
         $this->id = $id;
@@ -56,59 +65,134 @@ class TemplateForm extends Form
     {
         $this->setDefaultElementDecorator(new DivDecorator());
 
-        $frequency = [
-            'minutely' => 'Minutely',
-            'hourly'   => 'Hourly',
-            'daily'    => 'Daily',
-            'weekly'   => 'Weekly',
-            'monthly'  => 'Monthly'
-        ];
-
-        $this->addElement('text', 'logo', [
+        $this->addElement('text', 'name', [
             'required'         => true,
-            'label'            => 'Logo',
-            'placeholder'      => 'Enter a name for your template',
-            'data-enable-time' => true
+            'label'            => 'Template Name',
+            'placeholder'      => 'Type your Template Name'
         ]);
 
-        $this->addElement('text', 'header', [
-            'required'  => true,
-            'label'     => 'Header',
-            'placeholder'      => 'Enter something',
-            'options'   => [null => 'Please choose'] + $frequency,
+        $this->addElement('text', 'bg_img', [
+            'required'         => true,
+            'label'            => 'Background Image',
+            'placeholder'      => 'Enter URL'
         ]);
 
-        $this->addElement('text', 'hehe', [
-            'required'  => true,
-            'label'     => 'Hehe',
-            'placeholder'      => 'Enter something',
-            'options'   => [null => 'Please choose'] + $this->listActions(),
-            'class'     => 'autosubmit'
+        $this->addElement('text', 'title_logo', [
+            'required'         => true,
+            'label'            => 'Title Logo',
+            'placeholder'      => 'Enter URL'
         ]);
+
+        $this->addElement('text', 'title', [
+            'required'         => true,
+            'label'            => 'Title',
+            'placeholder'      => 'Enter a Report Title'
+        ]);
+
+        //HEADER
+        //select1
+        $this->addElement('select', 'hcolumnone', [
+            'required'  => true,
+            'label'     => 'H:Column 1',
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+        //text1
+        $this->addElement('text', 'hconetext', [
+            'required'         => true,
+            'placeholder'      => 'Enter Text'
+        ]);
+
+        //select2
+        $this->addElement('select', 'hcolumntwo', [
+            'required'  => true,
+            'label'     => 'H:Column 2',
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+        //text2
+        $this->addElement('text', 'hctwotext', [
+            'required'         => true,
+            'placeholder'      => 'Enter URL'
+        ]);
+
+        //select3
+        $this->addElement('select', 'hcolumnthree', [
+            'required'  => true,
+            'label'     => 'H:Column 3',
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+        //select3
+        $this->addElement('select', 'hcolumnfour', [
+            'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+
+        //FOOTER
+        //select1
+        $this->addElement('select', 'fcolumnone', [
+            'required'  => true,
+            'label'     => 'F:Column 1',
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+        //select1
+        $this->addElement('select', 'fcolumnonenext', [
+            'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+
+        //select2
+        $this->addElement('select', 'fcolumntwo', [
+            'required'  => true,
+            'label'     => 'F:Column 2',
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+        //select2
+        $this->addElement('select', 'fcolumntwonext', [
+            'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+
+        //select3
+        $this->addElement('select', 'fcolumnthree', [
+            'required'  => true,
+            'label'     => 'F:Column 3',
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+        //select3
+        $this->addElement('select', 'fcolumnthreenext', [
+            'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions()
+        ]);
+
+        /*$this->addElement('checkbox', self::COVER_FIELDS_TOGGLE, [
+            'autosubmit' => true,
+            'label'     => 'Use Cover Page'
+        ]);*/
 
         $values = $this->getValues();
 
-        if (isset($values['action'])) {
-            $config = new Form();
-//            $config->populate($this->getValues());
+        /*if (isset($values[self::COVER_FIELDS_TOGGLE]) && $values[self::COVER_FIELDS_TOGGLE]) {
 
-            /** @var \Icinga\Module\Reporting\Hook\ActionHook $action */
-            $action = new $values['action'];
-
-            $action->initConfigForm($config, $this->report);
-
-            foreach ($config->getElements() as $element) {
-                $this->addElement($element);
-            }
-        }
+            $this->addElement('text', 'cover_image', [
+                'required'         => true,
+                'label'            => 'Image for coverpage',
+                'placeholder'      => 'Upload Image'
+            ]);
+        }*/
 
         $this->addElement('submit', 'submit', [
-            'label' => $this->id === null ? 'Create Template' : 'Update Schedule'
+            'label' => $this->id === null ? 'Create Template' : 'Update Template',
+            //'class' => ['data-base-target' => '_next']
+        ]);
+
+        $this->addElement('submit', 'cancel', [
+            'label' => $this->id === null ? 'Cancel' : 'Cancel',
+            //'href' => 'reporting/templates',
+            'formnovalidate' => true
         ]);
 
         if ($this->id !== null) {
             $this->addElement('submit', 'remove', [
-                'label'          => 'Remove Schedule',
+                'label'          => 'Remove Template',
                 'class'          => 'remove-button',
                 'formnovalidate' => true
             ]);
@@ -116,7 +200,7 @@ class TemplateForm extends Form
             /** @var SubmitElementInterface $remove */
             $remove = $this->getElement('remove');
             if ($remove->hasBeenPressed()) {
-                $this->getDb()->delete('schedule', ['id = ?' => $this->id]);
+                $this->getDb()->delete('template', ['id = ?' => $this->id]);
 
                 // Stupid cheat because ipl/html is not capable of multiple submit buttons
                 $this->getSubmitButton()->setValue($this->getSubmitButton()->getButtonLabel());
@@ -126,47 +210,66 @@ class TemplateForm extends Form
             }
         }
 
+        // cancel button
+        $cancel = $this->getElement('cancel');
+        if ($cancel->hasBeenPressed()) {
+            // Stupid cheat because ipl/html is not capable of multiple submit buttons
+            $this->getSubmitButton()->setValue($this->getSubmitButton()->getButtonLabel());
+            $this->valid = true;
+
+            return;
+        }
+
         // TODO(el): Remove once ipl/html's TextareaElement sets the value as content
         foreach ($this->getElements() as $element) {
             if ($element instanceof TextareaElement && $element->hasValue()) {
-                $element->setContent($element->getValue());
+                $element->setContent($element->getditActioValue());
             }
         }
     }
 
     public function onSuccess()
     {
-        $db = $this->getDb();
+        $cancel = $this->getElement('cancel');
+        if (! $cancel->hasBeenPressed()) {
 
-        $values = $this->getValues();
+            $db = $this->getDb();
 
-        $now = time() * 1000;
+            $values = $this->getValues();
 
-        $data = [
-            'name'     => \DateTime::createFromFormat('Y-m-d H:i', $values['name'])->getTimestamp() * 1000,
-            'lol' => $values['lol'],
-            'hehe'    => $values['hehe'],
-            'mtime'     => $now
-        ];
+            $now = time() * 1000;
 
-        unset($values['name']);
-        unset($values['lol']);
-        unset($values['hehe']);
+            $data = [
+                'name'      => $values['name'],
+              //  'coveron'   => $values['coveron'],
+                'mtime'     => $now
+            ];
+            unset($values['name']);
+            //unset($values['action']);
 
-        $data['config'] = json_encode($values);
+            $data['config'] = json_encode($values);
 
-        $db->beginTransaction();
+            $db->beginTransaction();
 
-        if ($this->id === null) {
-            $db->insert('schedule', $data + [
-                    'author'    => Auth::getInstance()->getUser()->getUsername(),
-                    'report_id' => $this->report->getId(),
-                    'ctime'     => $now
+            if ($this->id === null) {
+                $statement = $db->insert('template', [
+                    'name'         => $data['name'],
+                    'author'       => Auth::getInstance()->getUser()->getUsername(),
+                    //'use_coverpage' => $data['coveron'] == null ? '0' : '1',
+                    'ctime'        => $now,
+                    'mtime'        => $now
                 ]);
-        } else {
-            $db->update('schedule', $data, ['id = ?' => $this->id]);
+            } else {
+                $statement = $db->update('template', [
+                    'name'         => $data['name'],
+                    //'use_coverpage' => $data['coveron'] == null ? '0' : '1',
+                    'mtime'        => $now
+                ], ['id = ?' => $this->id]);
+            }
+
+            $db->commitTransaction();
+
         }
 
-        $db->commitTransaction();
     }
 }
