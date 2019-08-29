@@ -46,6 +46,13 @@ class ReportForm extends Form
             'class'     => 'autosubmit'
         ]);
 
+        $this->addElement('select', 'templates', [
+            'required'  => true,
+            'label'     => 'Templates',
+            'options'   => [null => 'Please choose'] + $this->listTemplates(),
+            'class'     => 'autosubmit'
+        ]);
+
         $values = $this->getValues();
 
         if (isset($values['reportlet'])) {
