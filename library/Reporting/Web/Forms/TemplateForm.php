@@ -4,6 +4,7 @@
 namespace Icinga\Module\Reporting\Web\Forms;
 
 use Icinga\Authentication\Auth;
+use Icinga\Forms\ConfigForm;
 use Icinga\Module\Reporting\Database;
 use Icinga\Module\Reporting\ProvidedActions;
 use Icinga\Module\Reporting\Template;
@@ -72,97 +73,109 @@ class TemplateForm extends Form
         ]);
 
         $this->addElement('text', 'bg_img', [
-            'required'         => true,
+           // 'required'         => true,
             'label'            => 'Background Image',
             'placeholder'      => 'Enter URL'
         ]);
 
         $this->addElement('text', 'title_logo', [
-            'required'         => true,
+            //'required'         => true,
             'label'            => 'Title Logo',
             'placeholder'      => 'Enter URL'
         ]);
 
         $this->addElement('text', 'title', [
-            'required'         => true,
+           // 'required'         => true,
             'label'            => 'Title',
-            'placeholder'      => 'Enter a Report Title'
+            'placeholder'      => 'Enter a Report Title',
+            'class'     => ['id' => 'title']
         ]);
 
-       /* //HEADER
+        //HEADER
         //select1
         $this->addElement('select', 'hcolumnone', [
-            'required'  => true,
+            //'required'  => true,
             'label'     => 'H:Column 1',
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'hcolumnone']
         ]);
         //text1
         $this->addElement('text', 'hconetext', [
-            'required'         => true,
-            'placeholder'      => 'Enter Text'
+            //'required'         => true,
+            'placeholder'      => 'Enter Text',
+            'class'     => ['id' => 'hconetext']
         ]);
 
         //select2
         $this->addElement('select', 'hcolumntwo', [
-            'required'  => true,
+            //'required'  => true,
             'label'     => 'H:Column 2',
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'hcolumntwo']
         ]);
         //text2
         $this->addElement('text', 'hctwotext', [
-            'required'         => true,
-            'placeholder'      => 'Enter URL'
+            //'required'         => true,
+            'placeholder'      => 'Enter URL',
+            'class'     => ['id' => 'hctwotext']
         ]);
 
         //select3
         $this->addElement('select', 'hcolumnthree', [
-            'required'  => true,
+            //'required'  => true,
             'label'     => 'H:Column 3',
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'hcolumnthree']
         ]);
         //select3
         $this->addElement('select', 'hcolumnfour', [
-            'required'  => true,
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            //'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'hcolumnfour']
         ]);
 
         //FOOTER
         //select1
         $this->addElement('select', 'fcolumnone', [
-            'required'  => true,
+            //'required'  => true,
             'label'     => 'F:Column 1',
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'fcolumnone']
         ]);
         //select1
         $this->addElement('select', 'fcolumnonenext', [
-            'required'  => true,
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            //'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'fcolumnonenext']
         ]);
 
         //select2
         $this->addElement('select', 'fcolumntwo', [
-            'required'  => true,
+            //'required'  => true,
             'label'     => 'F:Column 2',
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'fcolumntwo']
         ]);
         //select2
         $this->addElement('select', 'fcolumntwonext', [
-            'required'  => true,
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            //'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'fcolumntwonext']
         ]);
 
         //select3
         $this->addElement('select', 'fcolumnthree', [
-            'required'  => true,
+            //'required'  => true,
             'label'     => 'F:Column 3',
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'fcolumnthree']
         ]);
         //select3
         $this->addElement('select', 'fcolumnthreenext', [
-            'required'  => true,
-            'options'   => [null => 'Please choose'] + $this->listActions()
+            //'required'  => true,
+            'options'   => [null => 'Please choose'] + $this->listActions(),
+            'class'     => ['id' => 'fcolumnthreenext']
         ]);
-       */
 
         /*$this->addElement('checkbox', self::COVER_FIELDS_TOGGLE, [
             'autosubmit' => true,
@@ -179,11 +192,11 @@ class TemplateForm extends Form
                 'placeholder'      => 'Upload Image'
             ]);
         }*/
-
+        
         $this->addElement('submit', 'submit', [
             'label' => $this->id === null ? 'Create Template' : 'Update Template',
-            //'class' => ['data-base-target' => '_next']
-        ]);
+            //'href' => 'reporting/templates'
+            ]);
 
         $this->addElement('submit', 'cancel', [
             'label' => $this->id === null ? 'Cancel' : 'Cancel',
