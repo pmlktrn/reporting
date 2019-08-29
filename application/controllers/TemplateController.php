@@ -7,7 +7,6 @@ use GuzzleHttp\Psr7\ServerRequest;
 use Icinga\Application\Hook;
 use Icinga\Module\Reporting\Database;
 use Icinga\Module\Reporting\Template;
-
 use Icinga\Module\Reporting\Web\Controller;
 use Icinga\Module\Reporting\Web\Forms\PreviewForm;
 use Icinga\Module\Reporting\Web\Forms\ReportForm;
@@ -99,12 +98,12 @@ class TemplateController extends Controller
         $form->populate($values);
         $form->handleRequest(ServerRequest::fromGlobals());
 
-        //$this->redirectForm($form, 'reporting/templates');
-
         $cancel = $form->getElement('cancel');
-        if (! $cancel->hasBeenPressed()) {
+        $remove = $form->getElement('remove');
+        if (! $cancel->hasBeenPressed() && ! $remove->hasBeenPressed()) {
             $id = $this->template->getId();
-            $this->redirectForm($form, "reporting/template/preview?id=$id");
+            //$this->redirectForm($form, "reporting/template/edit?id=$id#!/icingaweb2/reporting/template/preview?id=$id");
+            $this->redirectForm($form, "reporting/template/edit?id=$id#!/icingaweb2/reporting/template?id=$id");
         } else {
             $this->redirectForm($form, 'reporting/templates');
         }
@@ -210,22 +209,22 @@ class TemplateController extends Controller
 
     protected function assembleActions()
     {
-        $reportId = $this->template->getId();
+        $templateId = $this->template->getId();
 
         $download = (new DropdownLink('Download'))
-            ->addLink('PDF', Url::fromPath('reporting/report/download?type=pdf', ['id' => $reportId]));
+            ->addLink('PDF', Url::fromPath('reporting/template/download?type=pdf', ['id' => $templateId]));
 
-        if ($this->template->providesData()) {
-            $download->addLink('CSV', Url::fromPath('reporting/report/download?type=csv', ['id' => $reportId]));
-            $download->addLink('JSON', Url::fromPath('reporting/report/download?type=json', ['id' => $reportId]));
+      /*  if ($this->template->providesData()) {
+            $download->addLink('CSV', Url::fromPath('reporting/template/download?type=csv', ['id' => $templateId]));
+            $download->addLink('JSON', Url::fromPath('reporting/template/download?type=json', ['id' => $templateId]));
         }
-
+*/
         $actions = new ActionBar();
 
         $actions
-            ->addLink('Modify', Url::fromPath('reporting/template/edit', ['id' => $reportId]), 'edit')
+            ->addLink('Modify', Url::fromPath('reporting/template/edit', ['id' => $templateId]), 'edit')
             ->add($download)
-            ->addLink('Send', Url::fromPath('reporting/report/send', ['id' => $reportId]), 'forward');
+            ->addLink('Send', Url::fromPath('reporting/template/send', ['id' => $templateId]), 'forward');
 
         return $actions;
     }
