@@ -19,6 +19,12 @@ class Template
     /** @var string */
     protected $author;
 
+    protected $timeframe;
+
+    protected $schedule;
+
+    protected $reportlets;
+
     /**
      * @param   int $id
      *
@@ -104,6 +110,7 @@ class Template
         }
        */
 
+
         return $template;
 
     }
@@ -171,64 +178,64 @@ class Template
     /**
      * @return  Timeframe
      */
-/*    public function getTimeframe()
+    public function getTimeframe()
     {
         return $this->timeframe;
     }
-*/
+
     /**
      * @param   Timeframe   $timeframe
      *
      * @return  $this
      */
-  /*  public function setTimeframe(Timeframe $timeframe)
+    public function setTimeframe(Timeframe $timeframe)
     {
         $this->timeframe = $timeframe;
 
         return $this;
     }
-*/
+
     /**
      * @return  Reportlet[]
      */
-  /*  public function getReportlets()
+    public function getReportlets()
     {
         return $this->reportlets;
     }
-*/
+
     /**
      * @param   Reportlet[] $reportlets
      *
      * @return  $this
      */
-  /*  public function setReportlets(array $reportlets)
+    public function setReportlets(array $reportlets)
     {
         $this->reportlets = $reportlets;
 
         return $this;
     }
-*/
+
     /**
      * @return  Schedule
      */
-  /*  public function getSchedule()
+    public function getSchedule()
     {
         return $this->schedule;
     }
-*/
+
     /**
      * @param   Schedule    $schedule
      *
      * @return  $this
      */
-  /*  public function setSchedule(Schedule $schedule)
+    public function setSchedule(Schedule $schedule)
     {
         $this->schedule = $schedule;
 
         return $this;
     }
-*/
-  /*  public function providesData()
+
+    public function providesData()
     {
         foreach ($this->getReportlets() as $reportlet) {
             $implementation = $reportlet->getImplementation();
@@ -240,11 +247,11 @@ class Template
 
         return false;
     }
-*/
+
     /**
      * @return  HtmlDocument
      */
-    /*public function toHtml()
+    public function toHtml()
     {
         $timerange = $this->getTimeframe()->getTimerange();
 
@@ -258,11 +265,11 @@ class Template
 
         return $html;
     }
-*/
+
     /**
      * @return  string
      */
-  /*  public function toCsv()
+    public function toCsv()
     {
         $timerange = $this->getTimeframe()->getTimerange();
 
@@ -284,11 +291,11 @@ class Template
 
         return Str::putcsv($csv);
     }
-*/
+
     /**
      * @return  string
      */
-  /*  public function toJson()
+    public function toJson()
     {
         $timerange = $this->getTimeframe()->getTimerange();
 
@@ -312,5 +319,5 @@ class Template
 
         return json_encode($json);
     }
-  */
+
 }
