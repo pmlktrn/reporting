@@ -38,6 +38,9 @@ class TemplatesController extends Controller
             ->orderBy('t.mtime', SORT_DESC);
 
         foreach ($this->getDb()->select($select) as $template) {
+            //$url = Url::fromPath('reporting/template/edit', ['id' => $template->id])->getAbsoluteUrl('&');
+            //#!/icingaweb2/reporting/template?id=$id
+            $id = $template->id;
             $url = Url::fromPath('reporting/template/edit', ['id' => $template->id])->getAbsoluteUrl('&');
 
             $tableRows[] = Html::tag('tr', ['href' => $url], [
