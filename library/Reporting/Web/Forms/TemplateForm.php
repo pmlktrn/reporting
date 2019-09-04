@@ -24,37 +24,11 @@ class TemplateForm extends Form
     use DecoratedElement;
     use ProvidedActions;
 
-    //const COVER_FIELDS_TOGGLE = 'coveron';
-
     /** @var Template */
     protected $template;
 
     protected $id;
 
-    const WILDCARD_NAME = 'allAndEverything';
-
-
-    /*public function setTemplate(Template $template)
-    {
-        $this->template = $template;
-
-        $schedule = $template->getSchedule();
-
-        if ($schedule !== null) {
-            $this->setId($schedule->getId());
-
-            $values = [
-                    'start'     => $schedule->getStart(),
-                   // 'action'    => $schedule->getAction(),
-                    'coveron'   => $schedule->getAction()
-                ] + $schedule->getConfig();
-
-            $this->populate($values);
-        }
-
-        return $this;
-    }
-*/
     public function setId($id)
     {
         $this->id = $id;
@@ -72,15 +46,9 @@ class TemplateForm extends Form
             'placeholder'      => 'Type your Template Name'
         ]);
 
-        $this->addElement('text', 'bg_img', [
-           // 'required'         => true,
-            'label'            => 'Background Image',
-            'placeholder'      => 'Enter URL'
-        ]);
-
-        $this->addElement('text', 'title_logo', [
+        $this->addElement('text', 'company_logo', [
             //'required'         => true,
-            'label'            => 'Title Logo',
+            'label'            => 'Company Logo',
             'placeholder'      => 'Enter URL'
         ]);
 
@@ -93,7 +61,7 @@ class TemplateForm extends Form
 
         //HEADER
         //select1
-        $this->addElement('select', 'hcolumnone', [
+      /*  $this->addElement('select', 'hcolumnone', [
             //'required'  => true,
             'label'     => 'H:Column 1',
             'options'   => [null => 'Please choose'] + $this->listActions(),
@@ -176,7 +144,7 @@ class TemplateForm extends Form
             'options'   => [null => 'Please choose'] + $this->listActions(),
             'class'     => ['id' => 'fcolumnthreenext']
         ]);
-
+*/
         /*$this->addElement('checkbox', self::COVER_FIELDS_TOGGLE, [
             'autosubmit' => true,
             'label'     => 'Use Cover Page'
@@ -184,17 +152,9 @@ class TemplateForm extends Form
 
         $values = $this->getValues();
 
-        /*if (isset($values[self::COVER_FIELDS_TOGGLE]) && $values[self::COVER_FIELDS_TOGGLE]) {
-
-            $this->addElement('text', 'cover_image', [
-                'required'         => true,
-                'label'            => 'Image for coverpage',
-                'placeholder'      => 'Upload Image'
-            ]);
-        }*/
         
         $this->addElement('submit', 'submit', [
-            'label' => $this->id === null ? 'Create Template' : 'Update Template',
+            'label' => $this->id === null ? 'Create Template' : 'Update/Preview Template',
             //'href' => 'reporting/templates'
             ]);
 
@@ -224,7 +184,6 @@ class TemplateForm extends Form
             }
         }
 
-        // cancel button
         $cancel = $this->getElement('cancel');
         if ($cancel->hasBeenPressed()) {
             // Stupid cheat because ipl/html is not capable of multiple submit buttons
@@ -255,11 +214,11 @@ class TemplateForm extends Form
 
             $data = [
                 'name'      => $values['name'],
-              //  'coveron'   => $values['coveron'],
+                'title'        => $values['title'],
+                'company_logo'  => $values['company_logo'],
                 'mtime'     => $now
             ];
             unset($values['name']);
-            //unset($values['action']);
 
             $data['config'] = json_encode($values);
 
@@ -269,14 +228,16 @@ class TemplateForm extends Form
                 $statement = $db->insert('template', [
                     'name'         => $data['name'],
                     'author'       => Auth::getInstance()->getUser()->getUsername(),
-                    //'use_coverpage' => $data['coveron'] == null ? '0' : '1',
+                    'title'        => $data['title'],
+                    'company_logo' => $data['company_logo'],
                     'ctime'        => $now,
                     'mtime'        => $now
                 ]);
             } else {
                 $statement = $db->update('template', [
                     'name'         => $data['name'],
-                    //'use_coverpage' => $data['coveron'] == null ? '0' : '1',
+                    'title'        => $data['title'],
+                    'company_logo' => $data['company_logo'],
                     'mtime'        => $now
                 ], ['id = ?' => $this->id]);
             }
@@ -284,6 +245,5 @@ class TemplateForm extends Form
             $db->commitTransaction();
 
         }
-
     }
 }
