@@ -4,6 +4,7 @@
 namespace Icinga\Module\Reporting;
 
 use ipl\Html\HtmlDocument;
+use ipl\Html\HtmlString;
 use ipl\Sql;
 
 class Template
@@ -19,11 +20,15 @@ class Template
     /** @var string */
     protected $author;
 
+    /** @var string */
+    protected $title;
+
+    /** @var string */
+    protected $companyLogo;
+
     protected $timeframe;
 
     protected $schedule;
-
-    protected $reportlets;
 
     /**
      * @param   int $id
@@ -52,8 +57,9 @@ class Template
         $template
             ->setId($row->id)
             ->setName($row->name)
-            ->setAuthor($row->author);
-           // ->setTimeframe(Timeframe::fromDb($row->timeframe_id));
+            ->setAuthor($row->author)
+            ->setTitle($row->title)
+            ->setCompanyLogo($row->company_logo);
 
        /* $select = (new Sql\Select())
             ->from('reportlet')
@@ -109,7 +115,6 @@ class Template
             $template->setSchedule($schedule);
         }
        */
-
 
         return $template;
 
@@ -176,148 +181,156 @@ class Template
     }
 
     /**
-     * @return  Timeframe
+     * @return string
      */
-    public function getTimeframe()
+    public function getTitle()
     {
-        return $this->timeframe;
+        return $this->title;
     }
 
     /**
-     * @param   Timeframe   $timeframe
+     * @param   string  $title
      *
      * @return  $this
      */
-    public function setTimeframe(Timeframe $timeframe)
+    public function setTitle($title)
     {
-        $this->timeframe = $timeframe;
+        $this->title = $title;
 
         return $this;
     }
 
     /**
-     * @return  Reportlet[]
+     * @return string
      */
-    public function getReportlets()
+    public function getCompanyLogo()
     {
-        return $this->reportlets;
+        return $this->companyLogo;
     }
 
     /**
-     * @param   Reportlet[] $reportlets
+     * @param   string  $companyLogo
      *
      * @return  $this
      */
-    public function setReportlets(array $reportlets)
+    public function setCompanyLogo($companyLogo)
     {
-        $this->reportlets = $reportlets;
+        $this->companyLogo = $companyLogo;
 
         return $this;
     }
 
-    /**
-     * @return  Schedule
-     */
-    public function getSchedule()
-    {
-        return $this->schedule;
-    }
-
-    /**
-     * @param   Schedule    $schedule
-     *
-     * @return  $this
-     */
-    public function setSchedule(Schedule $schedule)
-    {
-        $this->schedule = $schedule;
-
-        return $this;
-    }
-
-    public function providesData()
-    {
-        foreach ($this->getReportlets() as $reportlet) {
-            $implementation = $reportlet->getImplementation();
-
-            if ($implementation->providesData()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * @return  HtmlDocument
      */
     public function toHtml()
     {
-        $timerange = $this->getTimeframe()->getTimerange();
-
         $html = new HtmlDocument();
 
-        foreach ($this->getReportlets() as $reportlet) {
-            $implementation = $reportlet->getImplementation();
+        $template = new static();
 
-            $html->add($implementation->getHtml($timerange, $reportlet->getConfig()));
-        }
+        $db = $template->getDb();
+
+        $dbtitle = (new Sql\Select())
+            ->from('template')
+            ->columns('title')
+            ->where(['id = ?' => $this->id]);
+
+        $rowtitle = $db->select($dbtitle)->fetch();
+
+
+        $dbcompanylogo = (new Sql\Select())
+            ->from('template')
+            ->columns('company_logo')
+            ->where(['id = ?' => $this->id]);
+
+        $rowcompanylogo = $db->select($dbcompanylogo)->fetch();
+
+        $string = new HtmlString("<!DOCTYPE html>
+            <html>
+            <head>
+            <style>
+         
+            @media print 
+            {
+            @page { margin: 0; }
+            body { margin:  0cm;}
+            }
+            
+            p
+            {
+            margin:0;
+            padding:0;
+            font-size: 30px;
+            }
+            
+            .undertitle
+            {
+            margin:0;
+            padding:0;
+            font-size: 18px;
+            }
+     
+            .footer
+            {
+            width:180mm;
+            margin-top:2mm;
+            }
+         
+            .img_icinga
+            {
+            /*display: block;*/
+            margin-left: auto;
+            margin-right: auto;
+            width: 45%;
+            }
+            
+            .img_company_logo
+            {
+            margin-left: auto;
+            margin-right: auto;
+            width: 45%;
+            padding: 10mm;
+            
+            }
+            
+            </style>
+            </head>
+            <body>
+            <div id='allcontent'>
+            <div id=\"wrapper\">
+            
+            <table class=\"heading\" style=\"width:100%;\" border='0'>
+            <td rowspan=\"2\" valign=\"top\" align=\"left\" style=\"padding:10mm; width: 30%;\">Datum</td>
+            <td rowspan=\"2\" valign=\"top\" align=\"middle\" style=\"padding:10mm; width: 30%;\"><img class='img_icinga' src=\"https://upload.wikimedia.org/wikipedia/de/thumb/7/70/Icinga_logo.svg/2880px-Icinga_logo.svg.png\"/></td>
+            <td rowspan=\"2\" valign=\"top\" align=\"right\" style=\"padding:10mm; width: 30%;\">Spruch</td>
+            </table>
+            
+            <p style='text-align:center; font-weight:bold; padding-top:20mm;'>$rowtitle->title</p>
+            <br />
+            <p class='undertitle' style=\"text-align:center; font-weight:bold; padding-top:5mm;\">Untertitel</p>
+
+            <br>
+           
+            <div id='footer'>
+            <table style=\"width:100%;\" border='0'>
+            <td rowspan=\"2\" valign=\"top\" align=\"left\" style=\"padding:10mm; width: 30 %;\">Firmenname</td>
+            <td rowspan=\"2\" valign=\"top\" align=\"middle\"><img class='img_company_logo' src=\"$rowcompanylogo->company_logo\"/></td>
+            <td rowspan=\"2\" valign=\"top\" align=\"right\" style=\"padding:10mm; width: 30 %;\">Seitenzahl</td>
+            </table>
+            </div>
+           
+            </div>
+            </div>
+            </body>
+            </html>");
+
+        $html->setContent($string);
+
+        //$html = new TemplateForm();
 
         return $html;
-    }
-
-    /**
-     * @return  string
-     */
-    public function toCsv()
-    {
-        $timerange = $this->getTimeframe()->getTimerange();
-
-        $csv = [];
-
-        foreach ($this->getReportlets() as $reportlet) {
-            $implementation = $reportlet->getImplementation();
-
-            if ($implementation->providesData()) {
-                $data = $implementation->getData($timerange, $reportlet->getConfig());
-                $csv[] = array_merge($data->getDimensions(), $data->getValues());
-                foreach ($data->getRows() as $row) {
-                    $csv[] = array_merge($row->getDimensions(), $row->getValues());
-                }
-
-                break;
-            }
-        }
-
-        return Str::putcsv($csv);
-    }
-
-    /**
-     * @return  string
-     */
-    public function toJson()
-    {
-        $timerange = $this->getTimeframe()->getTimerange();
-
-        $json = [];
-
-        foreach ($this->getReportlets() as $reportlet) {
-            $implementation = $reportlet->getImplementation();
-
-            if ($implementation->providesData()) {
-                $data = $implementation->getData($timerange, $reportlet->getConfig());
-                $dimensions = $data->getDimensions();
-                $values = $data->getValues();
-                foreach ($data->getRows() as $row) {
-                    $json[] = \array_combine($dimensions, $row->getDimensions())
-                        + \array_combine($values, $row->getValues());
-                }
-
-                break;
-            }
-        }
-
-        return json_encode($json);
     }
 
 }
