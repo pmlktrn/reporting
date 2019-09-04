@@ -47,7 +47,7 @@ class ReportForm extends Form
         ]);
 
         $this->addElement('select', 'templates', [
-            'required'  => true,
+           // 'required'  => true,
             'label'     => 'Templates',
             'options'   => [null => 'Please choose'] + $this->listTemplates(),
             'class'     => 'autosubmit'
@@ -116,6 +116,7 @@ class ReportForm extends Form
                 'name'         => $values['name'],
                 'author'       => Auth::getInstance()->getUser()->getUsername(),
                 'timeframe_id' => $values['timeframe'],
+                'template_id'  => $values['templates'],
                 'ctime'        => $now,
                 'mtime'        => $now
             ]);
@@ -125,6 +126,7 @@ class ReportForm extends Form
             $db->update('report', [
                 'name'         => $values['name'],
                 'timeframe_id' => $values['timeframe'],
+                'template_id'  => $values['templates'],
                 'mtime'        => $now
             ], ['id = ?' => $this->id]);
 
