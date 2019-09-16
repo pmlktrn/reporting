@@ -8,10 +8,6 @@ use Icinga\Application\Hook;
 use Icinga\Module\Reporting\Database;
 use Icinga\Module\Reporting\Template;
 use Icinga\Module\Reporting\Web\Controller;
-use Icinga\Module\Reporting\Controllers;
-use Icinga\Module\Reporting\Web\Forms\ReportForm;
-use Icinga\Module\Reporting\Web\Forms\ScheduleForm;
-use Icinga\Module\Reporting\Web\Forms\SendForm;
 use Icinga\Module\Reporting\Web\Forms\TemplateForm;
 use Icinga\Web\StyleSheet;
 use ipl\Html\Error;
@@ -51,35 +47,6 @@ class TemplateController extends Controller
         }
     }
 
-//    public function previewAction()
-//    {
-//        $this->setTitle('Preview');
-//
-//        $values = [
-//            'name'      => $this->template->getName(),
-//            // TODO(el): Must cast to string here because ipl/html does not support integer return values for attribute callbacks
-//        ];
-//
-//        //  $reportlet = $this->template->getReportlets()[0];
-//
-//        //$values['reportlet'] = $reportlet->getClass();
-//
-//        //foreach ($reportlet->getConfig() as $name => $value) {
-//        //   $values[$name] = $value;
-//        // }
-//
-//        /*$form = new TemplateForm();
-//        $form->setId($this->template->getId());
-//        $form->populate($values);
-//        $form->handleRequest(ServerRequest::fromGlobals());
-//*/
-//
-//        $form = new PreviewController();
-//        $this->redirectForm($form, 'reporting/templates');
-//
-//        $this->addContent($form);
-//    }
-
     public function editAction()
     {
         $this->setTitle('Edit Template');
@@ -87,17 +54,11 @@ class TemplateController extends Controller
         $values = [
             'name'      => $this->template->getName(),
             'title'     => $this->template->getTitle(),
+            'subtitle'  => $this->template->getSubtitle(),
+            'company_name'  => $this->template->getCompanyName(),
             'company_logo'  => $this->template->getCompanyLogo()
             // TODO(el): Must cast to string here because ipl/html does not support integer return values for attribute callbacks
         ];
-
-      //  $reportlet = $this->template->getReportlets()[0];
-
-        //$values['reportlet'] = $reportlet->getClass();
-
-        //foreach ($reportlet->getConfig() as $name => $value) {
-         //   $values[$name] = $value;
-       // }
 
         $form = new TemplateForm();
         $form->setId($this->template->getId());
@@ -110,7 +71,6 @@ class TemplateController extends Controller
             $id = $this->template->getId();
             //$this->redirectForm($form, "reporting/template/edit?id=$id#!/icingaweb2/reporting/template/preview?id=$id");
             $this->redirectForm($form, "reporting/template/edit?id=$id#!/icingaweb2/reporting/template?id=$id");
-            //$this->redirectForm($form, "reporting/template/edit?id=$id#!/icingaweb2/reporting/preview?id=$id");
         } else {
             $this->redirectForm($form, 'reporting/templates');
         }
@@ -219,16 +179,9 @@ class TemplateController extends Controller
 
         $download = (new DropdownLink('Download'))
             ->addLink('PDF', Url::fromPath('reporting/template/download?type=pdf', ['id' => $templateId]));
-
-      /*  if ($this->template->providesData()) {
-            $download->addLink('CSV', Url::fromPath('reporting/template/download?type=csv', ['id' => $templateId]));
-            $download->addLink('JSON', Url::fromPath('reporting/template/download?type=json', ['id' => $templateId]));
-        }
-*/
         $actions = new ActionBar();
 
         $actions
-            //->addLink('Modify', Url::fromPath('reporting/template/edit', ['id' => $templateId]), 'edit')
             ->add($download)
             ->addLink('Send', Url::fromPath('reporting/template/send', ['id' => $templateId]), 'forward');
 
