@@ -24,6 +24,12 @@ class Template
     protected $title;
 
     /** @var string */
+    protected $subtitle;
+
+    /** @var string */
+    protected $companyName;
+
+    /** @var string */
     protected $companyLogo;
 
     protected $timeframe;
@@ -59,62 +65,9 @@ class Template
             ->setName($row->name)
             ->setAuthor($row->author)
             ->setTitle($row->title)
+            ->setSubtitle($row->subtitle)
+            ->setCompanyName($row->company_name)
             ->setCompanyLogo($row->company_logo);
-
-       /* $select = (new Sql\Select())
-            ->from('reportlet')
-            ->columns('*')
-            ->where(['report_id = ?' => $id]);
-
-        $row = $db->select($select)->fetch();
-
-        if ($row === false) {
-            throw new \Exception('No reportlets configured.');
-        }
-
-        $reportlet = new Reportlet();
-
-        $reportlet
-            ->setId($row->id)
-            ->setClass($row->class);
-
-        $select = (new Sql\Select())
-            ->from('config')
-            ->columns('*')
-            ->where(['reportlet_id = ?' => $row->id]);
-
-        $rows = $db->select($select)->fetchAll();
-
-        $config = [];
-
-        foreach ($rows as $row) {
-            $config[$row->name] = $row->value;
-        }
-
-        $reportlet->setConfig($config);
-
-        $template->setReportlets([$reportlet]);
-
-        $select = (new Sql\Select())
-            ->from('schedule')
-            ->columns('*')
-            ->where(['report_id = ?' => $id]);
-
-        $row = $db->select($select)->fetch();
-
-        if ($row !== false) {
-            $schedule = new Schedule();
-
-            $schedule
-                ->setId($row->id)
-                ->setStart((new \DateTime())->setTimestamp((int) $row->start / 1000))
-                ->setFrequency($row->frequency)
-                ->setAction($row->action)
-                ->setConfig(json_decode($row->config, true));
-
-            $template->setSchedule($schedule);
-        }
-       */
 
         return $template;
 
@@ -200,6 +153,49 @@ class Template
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getSubtitle()
+    {
+        return $this->subtitle;
+    }
+
+    /**
+     * @param   string  $subtitle
+     *
+     * @return  $this
+     */
+    public function setSubtitle($subtitle)
+    {
+        $this->subtitle = $subtitle;
+
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCompanyName()
+    {
+        return $this->companyName;
+    }
+
+    /**
+     * @param   string  $companyName
+     *
+     * @return  $this
+     */
+    public function setCompanyName($companyName)
+    {
+        $this->companyName = $companyName;
+
+        return $this;
+    }
+
+
     /**
      * @return string
      */
@@ -228,24 +224,7 @@ class Template
     {
         $html = new HtmlDocument();
 
-        $template = new static();
-
-        $db = $template->getDb();
-
-        $dbtitle = (new Sql\Select())
-            ->from('template')
-            ->columns('title')
-            ->where(['id = ?' => $this->id]);
-
-        $rowtitle = $db->select($dbtitle)->fetch();
-
-
-        $dbcompanylogo = (new Sql\Select())
-            ->from('template')
-            ->columns('company_logo')
-            ->where(['id = ?' => $this->id]);
-
-        $rowcompanylogo = $db->select($dbcompanylogo)->fetch();
+        $now = date('d.m.Y');
 
         $string = new HtmlString("<!DOCTYPE html>
             <html>
@@ -302,21 +281,21 @@ class Template
             <div id=\"wrapper\">
             
             <table class=\"heading\" style=\"width:100%;\" border='0'>
-            <td rowspan=\"2\" valign=\"top\" align=\"left\" style=\"padding:10mm; width: 30%;\">Datum</td>
+            <td rowspan=\"2\" valign=\"top\" align=\"left\" style=\"padding:10mm; width: 30%;\">$now</td>
             <td rowspan=\"2\" valign=\"top\" align=\"middle\" style=\"padding:10mm; width: 30%;\"><img class='img_icinga' src=\"https://upload.wikimedia.org/wikipedia/de/thumb/7/70/Icinga_logo.svg/2880px-Icinga_logo.svg.png\"/></td>
             <td rowspan=\"2\" valign=\"top\" align=\"right\" style=\"padding:10mm; width: 30%;\">Spruch</td>
             </table>
             
-            <p style='text-align:center; font-weight:bold; padding-top:20mm;'>$rowtitle->title</p>
+            <p style='text-align:center; font-weight:bold; padding-top:20mm;'>$this->title</p>
             <br />
-            <p class='undertitle' style=\"text-align:center; font-weight:bold; padding-top:5mm;\">Untertitel</p>
+            <p class='undertitle' style=\"text-align:center; font-weight:bold; padding-top:5mm;\">$this->subtitle</p>
 
             <br>
            
             <div id='footer'>
             <table style=\"width:100%;\" border='0'>
-            <td rowspan=\"2\" valign=\"top\" align=\"left\" style=\"padding:10mm; width: 30 %;\">Firmenname</td>
-            <td rowspan=\"2\" valign=\"top\" align=\"middle\"><img class='img_company_logo' src=\"$rowcompanylogo->company_logo\"/></td>
+            <td rowspan=\"2\" valign=\"top\" align=\"left\" style=\"padding:10mm; width: 30 %;\">$this->companyName</td>
+            <td rowspan=\"2\" valign=\"top\" align=\"middle\"><img class='img_company_logo' src=\"$this->companyLogo\"/></td>
             <td rowspan=\"2\" valign=\"top\" align=\"right\" style=\"padding:10mm; width: 30 %;\">Seitenzahl</td>
             </table>
             </div>
