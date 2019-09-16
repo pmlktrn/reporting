@@ -4,19 +4,13 @@
 namespace Icinga\Module\Reporting\Web\Forms;
 
 use Icinga\Authentication\Auth;
-use Icinga\Forms\ConfigForm;
 use Icinga\Module\Reporting\Database;
 use Icinga\Module\Reporting\ProvidedActions;
 use Icinga\Module\Reporting\Template;
 use Icinga\Module\Reporting\Web\DivDecorator;
-use Icinga\Module\Reporting\Web\Flatpickr;
-use Icinga\Module\Reporting\Web\Controller;
 use ipl\Html\Form;
 use ipl\Html\FormElement\SubmitElementInterface;
 use ipl\Html\FormElement\TextareaElement;
-use ipl\Html\Html;
-use reportingipl\Web\Url;
-use Icinga\Web;
 
 class TemplateForm extends Form
 {
@@ -46,8 +40,12 @@ class TemplateForm extends Form
             'placeholder'      => 'Type your Template Name'
         ]);
 
+        $this->addElement('text', 'company_name', [
+            'label'            => 'Company Name',
+            'placeholder'      => 'Enter Company Name'
+        ]);
+
         $this->addElement('text', 'company_logo', [
-            //'required'         => true,
             'label'            => 'Company Logo',
             'placeholder'      => 'Enter URL'
         ]);
@@ -55,9 +53,35 @@ class TemplateForm extends Form
         $this->addElement('text', 'title', [
            // 'required'         => true,
             'label'            => 'Title',
-            'placeholder'      => 'Enter a Report Title',
+            'placeholder'      => 'Enter Report Title',
             'class'     => ['id' => 'title']
         ]);
+
+        $this->addElement('text', 'subtitle', [
+            // 'required'         => true,
+            'label'            => 'Subitle',
+            'placeholder'      => 'Enter Report Subtitle',
+            'class'     => ['id' => 'subtitle']
+        ]);
+
+//        $upload = new HtmlString("
+//            <form id=\"...\" method=\"post\" enctype=\"multipart/form-data\">
+//            <table class=\"...\">
+//            <tr>
+//            <td><input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"1024\"></td>
+//            <td><input type=\"file\" name=\"dateiname\"></td>
+//            </tr>
+//            </table>
+//            <table class=\"...\">
+//            <tr>
+//            <td><input type=\"hidden\" name=\"Upload File\" value=\"1\"></td>
+//            <!-- <td><input type=\"image\" name=\"submit\"/></td> -->
+//            </tr>
+//            </table>
+//            </form>
+//        ");
+//
+//        $this->add($upload);
 
         //HEADER
         //select1
@@ -174,6 +198,7 @@ class TemplateForm extends Form
             /** @var SubmitElementInterface $remove */
             $remove = $this->getElement('remove');
             if ($remove->hasBeenPressed()) {
+                $this->getDb()->delete('report', ['template_id = ?' => $this->id]);
                 $this->getDb()->delete('template', ['id = ?' => $this->id]);
 
                 // Stupid cheat because ipl/html is not capable of multiple submit buttons
@@ -215,6 +240,8 @@ class TemplateForm extends Form
             $data = [
                 'name'      => $values['name'],
                 'title'        => $values['title'],
+                'subtitle'      => $values['subtitle'],
+                'company_name'  => $values['company_name'],
                 'company_logo'  => $values['company_logo'],
                 'mtime'     => $now
             ];
@@ -229,6 +256,8 @@ class TemplateForm extends Form
                     'name'         => $data['name'],
                     'author'       => Auth::getInstance()->getUser()->getUsername(),
                     'title'        => $data['title'],
+                    'subtitle'     => $data['subtitle'],
+                    'company_name' => $data['company_name'],
                     'company_logo' => $data['company_logo'],
                     'ctime'        => $now,
                     'mtime'        => $now
@@ -237,6 +266,8 @@ class TemplateForm extends Form
                 $statement = $db->update('template', [
                     'name'         => $data['name'],
                     'title'        => $data['title'],
+                    'subtitle'     => $data['subtitle'],
+                    'company_name' => $data['company_name'],
                     'company_logo' => $data['company_logo'],
                     'mtime'        => $now
                 ], ['id = ?' => $this->id]);
