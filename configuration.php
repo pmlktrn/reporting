@@ -40,4 +40,9 @@ namespace Icinga\Module\Reporting {
         'reporting/schedules',
         $this->translate('Allow managing schedules')
     );
+
+    $this->providePermission(
+        'reporting/templates',
+        $this->translate('Allow managing templates')
+    );
 }
